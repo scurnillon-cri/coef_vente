@@ -1,288 +1,447 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Calculateur de Coefficient de Vente - CRI</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Calculateur de Coefficient de Vente - CRI</title>
 
-<!-- Bootstrap -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
-<style>
-    body {
+    <style>
+      body {
         background: #f5f7fa;
         font-family: "Inter", system-ui, sans-serif;
-    }
+      }
 
-    h1, h2, h3 {
+      h1,
+      h2,
+      h3 {
         font-weight: 700;
-    }
+      }
 
-    .card {
+      .card {
         border-radius: 14px;
         border: none;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    }
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      }
 
-    .card-header {
+      .card-header {
         font-size: 1.15rem;
         font-weight: 600;
         border-radius: 14px 14px 0 0 !important;
-    }
+      }
 
-    /* Barre de compétitivité */
-    .progress {
-        height: 18px;
-        border-radius: 20px;
-        overflow: hidden;
-    }
-
-    #competitiviteTexte {
-        font-size: 1.25rem;
-        font-weight: 600;
-        line-height: 1.4;
-    }
-
-    /* Header premium */
-    .cri-header {
+      /* Header CRI */
+      .cri-header {
         background: #ffffff;
         border-radius: 14px;
-        box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-    }
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      }
 
-    .cri-logo {
+      .cri-logo {
         max-height: 80px;
-    }
-
-    @media (max-width: 768px) {
+      }
+      @media (max-width: 768px) {
         .cri-logo {
-            max-height: 60px;
+          max-height: 60px;
         }
-    }
-</style>
-</head>
+      }
 
-<body class="p-3">
+      /* Barre outils */
+      .toolbar {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        padding: 12px 16px;
+      }
 
-<div class="container">
+      .progress {
+        height: 18px;
+        border-radius: 20px;
+      }
 
-    <!-- HEADER AVEC LOGO CRI -->
-    <div class="cri-header d-flex flex-column flex-md-row align-items-center justify-content-between px-4 py-3 mb-4">
-        <img src="logo_cri.png" alt="CRI" class="cri-logo">
+      #competitiviteTexte {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+
+  <body class="p-3">
+    <div class="container">
+      <!-- HEADER CRI -->
+      <div
+        class="cri-header d-flex flex-column flex-md-row align-items-center justify-content-between px-4 py-3 mb-4"
+      >
+        <img src="logo_cri.png" alt="CRI" class="cri-logo" />
         <h1 class="text-center text-md-end mt-3 mt-md-0">
-            Calculateur de Coefficient de Vente
+          Calculateur de Coefficient de Vente
         </h1>
-    </div>
+      </div>
 
-    <!-- Prix Public -->
-    <div class="card mb-4">
+      <!-- 🔵 BARRE D'OUTILS (Option C) -->
+      <div
+        class="toolbar mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3"
+      >
+        <div class="flex-grow-1">
+          <label class="form-label fw-bold mb-1"
+            >Nom de la configuration :</label
+          >
+          <input
+            type="text"
+            id="configName"
+            class="form-control"
+            placeholder="Ex : Offre fournisseur 66%"
+          />
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-primary" onclick="saveConfiguration()">
+            💾 Sauvegarder
+          </button>
+
+          <select id="configList" class="form-select">
+            <option value="">— Configurations enregistrées —</option>
+          </select>
+
+          <button class="btn btn-success" onclick="loadConfiguration()">
+            📂 Charger
+          </button>
+          <button class="btn btn-danger" onclick="deleteConfiguration()">
+            🗑 Supprimer
+          </button>
+        </div>
+      </div>
+
+      <!-- Prix Public -->
+      <div class="card mb-4">
         <div class="card-header bg-dark text-white">Prix Public</div>
         <div class="card-body">
-            <label class="form-label">Prix Public (€)</label>
-            <input type="number" id="prixPublic" class="form-control" value="500" oninput="updateAll()">
+          <label class="form-label">Prix Public (€)</label>
+          <input
+            type="number"
+            id="prixPublic"
+            class="form-control"
+            value="500"
+            oninput="updateAll()"
+          />
         </div>
-    </div>
+      </div>
 
-    <!-- AVANT / APRÈS -->
-    <div class="row g-4">
-
+      <!-- AVANT / APRÈS -->
+      <div class="row g-4">
         <!-- AVANT -->
         <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">Avant</div>
-                <div class="card-body">
+          <div class="card h-100">
+            <div class="card-header bg-primary text-white">Avant</div>
+            <div class="card-body">
+              <label class="form-label">Remise (%)</label>
+              <input
+                type="number"
+                id="remiseAvant"
+                class="form-control"
+                oninput="updateAll()"
+              />
 
-                    <label class="form-label">Remise (%)</label>
-                    <input type="number" id="remiseAvant" class="form-control" oninput="updateAll()">
+              <label class="form-label mt-3">Prix d'achat (€)</label>
+              <input
+                type="number"
+                id="achatAvant"
+                class="form-control"
+                readonly
+              />
 
-                    <label class="form-label mt-3">Prix d'achat (€)</label>
-                    <input type="number" id="achatAvant" class="form-control" readonly>
+              <label class="form-label mt-3">Coef de vente</label>
+              <input
+                type="number"
+                id="coefAvant"
+                step="0.01"
+                class="form-control"
+                oninput="updateAll()"
+              />
 
-                    <label class="form-label mt-3">Coef de vente</label>
-                    <input type="number" id="coefAvant" step="0.01" class="form-control" oninput="updateAll()">
+              <label class="form-label mt-3">Prix de vente (€)</label>
+              <input
+                type="number"
+                id="venteAvant"
+                class="form-control"
+                readonly
+              />
 
-                    <label class="form-label mt-3">Prix de vente (€)</label>
-                    <input type="number" id="venteAvant" class="form-control" readonly>
-
-                    <label class="form-label mt-3">Marge (€)</label>
-                    <input type="number" id="margeAvant" class="form-control" readonly>
-
-                </div>
+              <label class="form-label mt-3">Marge (€)</label>
+              <input
+                type="number"
+                id="margeAvant"
+                class="form-control"
+                readonly
+              />
             </div>
+          </div>
         </div>
 
         <!-- APRÈS -->
         <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header bg-success text-white">Après</div>
-                <div class="card-body">
+          <div class="card h-100">
+            <div class="card-header bg-success text-white">Après</div>
+            <div class="card-body">
+              <label class="form-label">Nouvelle Remise (%)</label>
+              <input
+                type="number"
+                id="remiseApres"
+                class="form-control"
+                oninput="updateAll()"
+              />
 
-                    <label class="form-label">Nouvelle Remise (%)</label>
-                    <input type="number" id="remiseApres" class="form-control" oninput="updateAll()">
+              <label class="form-label mt-3">Nouveau Prix d'achat (€)</label>
+              <input
+                type="number"
+                id="achatApres"
+                class="form-control"
+                readonly
+              />
 
-                    <label class="form-label mt-3">Nouveau Prix d'achat (€)</label>
-                    <input type="number" id="achatApres" class="form-control" readonly>
+              <label class="form-label mt-3">Nouveau Coef de vente</label>
+              <div class="input-group">
+                <input
+                  type="number"
+                  id="coefApres"
+                  step="0.01"
+                  class="form-control"
+                  oninput="updateAll()"
+                />
+                <button
+                  class="btn btn-outline-primary"
+                  onclick="calcCoefEqualGain()"
+                >
+                  = Gain Avant
+                </button>
+              </div>
 
-                    <label class="form-label mt-3">Nouveau Coef de vente</label>
-                    <div class="input-group">
-                        <input type="number" id="coefApres" step="0.01" class="form-control" oninput="updateAll()">
-                        <button class="btn btn-outline-primary" onclick="calcCoefEqualGain()">= Gain Avant</button>
-                    </div>
+              <label class="form-label mt-3">Nouveau Prix de vente (€)</label>
+              <input
+                type="number"
+                id="venteApres"
+                class="form-control"
+                readonly
+              />
 
-                    <label class="form-label mt-3">Nouveau Prix de vente (€)</label>
-                    <input type="number" id="venteApres" class="form-control" readonly>
+              <label class="form-label mt-3">Nouvelle Marge (€)</label>
+              <input
+                type="number"
+                id="margeApres"
+                class="form-control"
+                readonly
+              />
 
-                    <label class="form-label mt-3">Nouvelle Marge (€)</label>
-                    <input type="number" id="margeApres" class="form-control" readonly>
-
-                    <label class="form-label mt-3">Gain (%)</label>
-                    <input type="number" id="gainPourcent" class="form-control" readonly>
-
-                </div>
+              <label class="form-label mt-3">Gain (%)</label>
+              <input
+                type="number"
+                id="gainPourcent"
+                class="form-control"
+                readonly
+              />
             </div>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- RÉSULTAT -->
-    <div class="card mt-4">
-        <div class="card-header bg-info text-white">Résultat de Compétitivité</div>
+      <!-- RESULTAT -->
+      <div class="card mt-4">
+        <div class="card-header bg-info text-white">
+          Résultat de Compétitivité
+        </div>
         <div class="card-body">
+          <p id="competitiviteTexte" class="text-center mb-4"></p>
 
-            <p id="competitiviteTexte" class="text-center mb-4"></p>
-
-            <div class="progress">
-                <div id="competitiviteBarre" class="progress-bar bg-secondary" style="width: 0%"></div>
-            </div>
-
+          <div class="progress">
+            <div
+              id="competitiviteBarre"
+              class="progress-bar bg-secondary"
+              style="width: 0%"
+            ></div>
+          </div>
         </div>
+      </div>
     </div>
 
-</div>
+    <!-- JAVASCRIPT -->
+    <script>
+      /* ========= CALCUL PRINCIPAL ========= */
 
+      function updateAll() {
+        const prix = parseFloat(prixPublic.value);
 
-<!-- JAVASCRIPT -->
-<script>
+        // Avant
+        const remiseA = parseFloat(remiseAvant.value || 0);
+        const coefA = parseFloat(coefAvant.value || 0);
 
-/* ========= CALCUL PRINCIPAL ========= */
+        const achatA = prix * (1 - remiseA / 100);
+        const venteA = achatA * coefA;
+        const margeA = venteA - achatA;
 
-function updateAll() {
-    const prix = parseFloat(document.getElementById("prixPublic").value);
+        achatAvant.value = achatA.toFixed(2);
+        venteAvant.value = venteA.toFixed(2);
+        margeAvant.value = margeA.toFixed(2);
 
-    // Avant
-    const remiseA = parseFloat(document.getElementById("remiseAvant").value || 0);
-    const coefA = parseFloat(document.getElementById("coefAvant").value || 0);
+        // Après
+        const remiseB = parseFloat(remiseApres.value || 0);
+        const coefB = parseFloat(coefApres.value || 0);
 
-    const achatA = prix * (1 - remiseA / 100);
-    const venteA = achatA * coefA;
-    const margeA = venteA - achatA;
+        const achatB = prix * (1 - remiseB / 100);
+        const venteB = achatB * coefB;
+        const margeB = venteB - achatB;
 
-    document.getElementById("achatAvant").value = achatA.toFixed(2);
-    document.getElementById("venteAvant").value = venteA.toFixed(2);
-    document.getElementById("margeAvant").value = margeA.toFixed(2);
+        achatApres.value = achatB.toFixed(2);
+        venteApres.value = venteB.toFixed(2);
+        margeApres.value = margeB.toFixed(2);
 
-    // Après
-    const remiseB = parseFloat(document.getElementById("remiseApres").value || 0);
-    const coefB = parseFloat(document.getElementById("coefApres").value || 0);
+        gainPourcent.value = ((venteB / venteA - 1) * 100).toFixed(2);
 
-    const achatB = prix * (1 - remiseB / 100);
-    const venteB = achatB * coefB;
-    const margeB = venteB - achatB;
+        updateCompetitivite();
+      }
 
-    document.getElementById("achatApres").value = achatB.toFixed(2);
-    document.getElementById("venteApres").value = venteB.toFixed(2);
-    document.getElementById("margeApres").value = margeB.toFixed(2);
+      /* ========= BOUTON = GAIN AVANT ========= */
 
-    // Gain %
-    const gain = ((venteB / venteA) - 1) * 100;
-    document.getElementById("gainPourcent").value = gain.toFixed(2);
+      function calcCoefEqualGain() {
+        const achatA = parseFloat(achatAvant.value);
+        const venteA = parseFloat(venteAvant.value);
+        const margeA = venteA - achatA;
 
-    updateCompetitivite();
-}
+        const achatB = parseFloat(achatApres.value);
 
+        const venteBExact = achatB + margeA;
+        const coefExact = venteBExact / achatB;
 
+        venteApres.value = venteBExact.toFixed(2);
+        coefApres.value = coefExact.toFixed(2);
+        margeApres.value = margeA.toFixed(2);
 
-/* ========= BOUTON = GAIN AVANT ========= */
+        updateAll();
+      }
 
-function calcCoefEqualGain() {
-    const achatA = parseFloat(document.getElementById("achatAvant").value);
-    const venteA = parseFloat(document.getElementById("venteAvant").value);
-    const margeA = venteA - achatA;
+      /* ========= MESSAGE COMMERCIAL ========= */
 
-    const achatB = parseFloat(document.getElementById("achatApres").value);
+      function updateCompetitivite() {
+        const venteA = parseFloat(venteAvant.value);
+        const venteB = parseFloat(venteApres.value);
+        const margeA = parseFloat(margeAvant.value);
+        const margeB = parseFloat(margeApres.value);
 
-    const venteBExact = achatB + margeA;
-    const coefExact = venteBExact / achatB;
+        const texte = competitiviteTexte;
+        const barre = competitiviteBarre;
 
-    document.getElementById("venteApres").value = venteBExact.toFixed(2);
-    document.getElementById("coefApres").value = coefExact.toFixed(2);
-    document.getElementById("margeApres").value = margeA.toFixed(2);
+        if (!venteA || !venteB) return;
 
-    updateAll();
-}
+        const varPrix = (venteB / venteA - 1) * 100;
+        const varMarge = (margeB / margeA - 1) * 100;
 
+        const absPrix = Math.abs(varPrix).toFixed(2);
+        const absMarge = Math.abs(varMarge).toFixed(2);
 
+        let msg = "",
+          color = "",
+          emoji = "";
 
-/* ========= MESSAGE COMMERCIAL PREMIUM ========= */
+        if (Math.abs(varMarge) < 0.01 && varPrix < 0) {
+          emoji = "🟢";
+          color = "bg-success";
+          msg = `${emoji} Même marge. Prix plus bas de <b>${absPrix}%</b>.<br>Vous devenez instantanément plus compétitif.`;
+        } else if (Math.abs(varMarge) < 0.01 && varPrix > 0) {
+          emoji = "🟠";
+          color = "bg-warning";
+          msg = `${emoji} Votre marge reste identique, mais votre prix augmente de <b>${absPrix}%</b>.<br>Attention à la compétitivité.`;
+        } else if (varMarge > 0 && varPrix < 0) {
+          emoji = "🌟";
+          color = "bg-success";
+          msg = `${emoji} Vous améliorez votre marge de <b>${absMarge}%</b> tout en baissant votre prix de <b>${absPrix}%</b>.<br>C’est le scénario idéal : plus rentable ET plus compétitif.`;
+        } else if (varMarge > 0 && varPrix > 0) {
+          emoji = "⚖️";
+          color = "bg-info";
+          msg = `${emoji} Votre marge augmente de <b>${absMarge}%</b>, mais votre prix progresse aussi de <b>${absPrix}%</b>.<br>Vous gagnez en rentabilité mais perdez en compétitivité.`;
+        } else if (varMarge < 0 && varPrix < 0) {
+          emoji = "🔵";
+          color = "bg-primary";
+          msg = `${emoji} Prix plus attractif (<b>-${absPrix}%</b>), mais marge en retrait (<b>-${absMarge}%</b>).<br>À utiliser comme levier stratégique.`;
+        }
 
-function updateCompetitivite() {
+        texte.innerHTML = msg;
 
-    const venteA = parseFloat(document.getElementById("venteAvant").value);
-    const venteB = parseFloat(document.getElementById("venteApres").value);
-    const margeA = parseFloat(document.getElementById("margeAvant").value);
-    const margeB = parseFloat(document.getElementById("margeApres").value);
+        barre.className = "progress-bar " + color;
+        barre.style.width = Math.min(Math.abs(-varPrix + varMarge), 100) + "%";
+      }
 
-    const texte = document.getElementById("competitiviteTexte");
-    const barre = document.getElementById("competitiviteBarre");
+      /* ========= SAUVEGARDE CONFIGS (localStorage) ========= */
 
-    if (!venteA || !venteB) return;
+      function getAllConfigs() {
+        return JSON.parse(localStorage.getItem("coefConfigs") || "{}");
+      }
 
-    const varPrix = ((venteB / venteA) - 1) * 100;
-    const varMarge = ((margeB / margeA) - 1) * 100;
+      function updateConfigList() {
+        const list = configList;
+        const configs = getAllConfigs();
 
-    const absPrix = Math.abs(varPrix).toFixed(2);
-    const absMarge = Math.abs(varMarge).toFixed(2);
+        list.innerHTML = `<option value="">— Configurations enregistrées —</option>`;
 
-    let msg = "";
-    let color = "bg-secondary";
-    let emoji = "";
+        for (const name in configs) {
+          const opt = document.createElement("option");
+          opt.value = name;
+          opt.textContent = name;
+          list.appendChild(opt);
+        }
+      }
 
-    if (Math.abs(varMarge) < 0.01 && varPrix < 0) {
-        emoji = "🟢";
-        color = "bg-success";
-        msg = `${emoji} Même marge. Prix plus bas de <b>${absPrix}%</b>.<br>Vous devenez instantanément plus compétitif.`;
-    }
-    else if (Math.abs(varMarge) < 0.01 && varPrix > 0) {
-        emoji = "🟠";
-        color = "bg-warning";
-        msg = `${emoji} Votre marge reste identique, mais votre prix augmente de <b>${absPrix}%</b>.<br>Attention à la compétitivité.`;
-    }
-    else if (varMarge > 0 && varPrix < 0) {
-        emoji = "🌟";
-        color = "bg-success";
-        msg = `${emoji} Vous améliorez votre marge de <b>${absMarge}%</b> tout en baissant votre prix de <b>${absPrix}%</b>.<br>C’est le scénario idéal : plus rentable ET plus compétitif.`;
-    }
-    else if (varMarge > 0 && varPrix > 0) {
-        emoji = "⚖️";
-        color = "bg-info";
-        msg = `${emoji} Votre marge augmente de <b>${absMarge}%</b>, mais votre prix progresse aussi de <b>${absPrix}%</b>.<br>Vous gagnez en rentabilité mais perdez en compétitivité.`;
-    }
-    else if (varMarge < 0 && varPrix < 0) {
-        emoji = "🔵";
-        color = "bg-primary";
-        msg = `${emoji} Prix plus attractif (<b>-${absPrix}%</b>), mais marge en retrait (<b>-${absMarge}%</b>).<br>À utiliser comme levier stratégique.`;
-    }
+      function saveConfiguration() {
+        const name = configName.value.trim();
+        if (!name) return alert("Veuillez saisir un nom de configuration.");
 
-    texte.innerHTML = msg;
+        const configs = getAllConfigs();
 
-    let perf = (-varPrix + varMarge);
-    perf = Math.min(Math.abs(perf), 100);
+        configs[name] = {
+          prix: prixPublic.value,
+          remiseAvant: remiseAvant.value,
+          coefAvant: coefAvant.value,
+          remiseApres: remiseApres.value,
+          coefApres: coefApres.value,
+        };
 
-    barre.className = "progress-bar " + color;
-    barre.style.width = perf + "%";
-}
+        localStorage.setItem("coefConfigs", JSON.stringify(configs));
+        updateConfigList();
+        alert("Configuration sauvegardée !");
+      }
 
-updateAll();
-</script>
+      function loadConfiguration() {
+        const name = configList.value;
+        if (!name) return;
 
-</body>
+        const cfg = getAllConfigs()[name];
+
+        prixPublic.value = cfg.prix;
+        remiseAvant.value = cfg.remiseAvant;
+        coefAvant.value = cfg.coefAvant;
+        remiseApres.value = cfg.remiseApres;
+        coefApres.value = cfg.coefApres;
+
+        updateAll();
+      }
+
+      function deleteConfiguration() {
+        const name = configList.value;
+        if (!name) return;
+
+        const configs = getAllConfigs();
+        delete configs[name];
+        localStorage.setItem("coefConfigs", JSON.stringify(configs));
+
+        updateConfigList();
+      }
+
+      /* Init */
+      updateConfigList();
+      updateAll();
+    </script>
+  </body>
 </html>
