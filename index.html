@@ -13,14 +13,14 @@
 
     <style>
       body {
-        background: #f5f7fa;
+        background: #f0f2f5;
         font-family: "Inter", system-ui, sans-serif;
       }
 
       .card {
         border-radius: 14px;
         border: none;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
       }
 
       .cri-header {
@@ -48,31 +48,57 @@
       }
 
       .compare-card {
-        border-radius: 12px;
-        padding: 0;
-        margin: 0;
+        border-radius: 14px;
+        overflow: hidden;
+      }
+
+      /* Fond bloc Avant */
+      .avant-bg {
+        background: #f7f8fa;
+        color: #000;
+      }
+
+      /* Fond bloc Après */
+      .apres-bg {
+        background: #0a2345;
+        color: white;
       }
 
       .sticky-header {
         position: sticky;
         top: 0;
         z-index: 20;
-        padding: 8px;
+        padding: 10px;
         font-size: 1.1rem;
         font-weight: 700;
-        color: white;
         text-align: center;
       }
 
-      /* Labels et inputs plus compacts pour mobile */
-      @media (max-width: 768px) {
-        label {
-          font-size: 0.78rem;
-        }
-        input.form-control {
-          font-size: 0.85rem;
-          padding: 6px 8px;
-        }
+      .avant-header {
+        background: #0066ff;
+        color: white;
+      }
+
+      .apres-header {
+        background: #008852;
+        color: white;
+      }
+
+      label {
+        font-size: 0.78rem;
+        margin-bottom: 2px;
+      }
+
+      input.form-control {
+        font-size: 0.85rem;
+        padding: 6px 8px;
+      }
+
+      /* Inputs blancs sur fond bleu CRI */
+      .apres-bg input {
+        background: white !important;
+        color: #000 !important;
+        border: none;
       }
 
       .progress {
@@ -140,13 +166,13 @@
         </div>
       </div>
 
-      <!-- ⚡ GRID AVANT / APRÈS côte à côte même sur mobile -->
+      <!-- GRID AVANT / APRES -->
       <div class="compare-grid">
         <!-- AVANT -->
-        <div class="compare-card">
-          <div class="sticky-header bg-primary">Avant</div>
+        <div class="compare-card avant-bg">
+          <div class="sticky-header avant-header">Avant</div>
           <div class="p-3">
-            <label class="form-label">Remise (%)</label>
+            <label>Remise (%)</label>
             <input
               type="number"
               id="remiseAvant"
@@ -154,7 +180,7 @@
               oninput="updateAll()"
             />
 
-            <label class="form-label mt-3">Prix d'achat (€)</label>
+            <label class="mt-3">Prix achat (€)</label>
             <input
               type="number"
               id="achatAvant"
@@ -162,7 +188,7 @@
               readonly
             />
 
-            <label class="form-label mt-3">Coef de vente</label>
+            <label class="mt-3">Coef de vente</label>
             <input
               type="number"
               id="coefAvant"
@@ -171,7 +197,7 @@
               oninput="updateFromCoef('Avant')"
             />
 
-            <label class="form-label mt-3">Prix de vente (€)</label>
+            <label class="mt-3">Prix vente (€)</label>
             <input
               type="number"
               id="venteAvant"
@@ -179,7 +205,7 @@
               oninput="updateFromVente('Avant')"
             />
 
-            <label class="form-label mt-3">Marge (€)</label>
+            <label class="mt-3">Marge (€)</label>
             <input
               type="number"
               id="margeAvant"
@@ -189,11 +215,11 @@
           </div>
         </div>
 
-        <!-- APRÈS -->
-        <div class="compare-card">
-          <div class="sticky-header bg-success">Après</div>
+        <!-- APRES -->
+        <div class="compare-card apres-bg">
+          <div class="sticky-header apres-header">Après</div>
           <div class="p-3">
-            <label class="form-label">Nouvelle Remise (%)</label>
+            <label>Remise (%)</label>
             <input
               type="number"
               id="remiseApres"
@@ -201,7 +227,7 @@
               oninput="updateAll()"
             />
 
-            <label class="form-label mt-3">Nouveau Prix d'achat (€)</label>
+            <label class="mt-3">Prix achat (€)</label>
             <input
               type="number"
               id="achatApres"
@@ -209,7 +235,7 @@
               readonly
             />
 
-            <label class="form-label mt-3">Nouveau Coef de vente</label>
+            <label class="mt-3">Coef de vente</label>
             <div class="input-group">
               <input
                 type="number"
@@ -219,14 +245,14 @@
                 oninput="updateFromCoef('Apres')"
               />
               <button
-                class="btn btn-outline-primary"
+                class="btn btn-outline-light"
                 onclick="calcCoefEqualGain()"
               >
                 = Gain Avant
               </button>
             </div>
 
-            <label class="form-label mt-3">Nouveau Prix de vente (€)</label>
+            <label class="mt-3">Prix vente (€)</label>
             <input
               type="number"
               id="venteApres"
@@ -234,7 +260,7 @@
               oninput="updateFromVente('Apres')"
             />
 
-            <label class="form-label mt-3">Nouvelle Marge (€)</label>
+            <label class="mt-3">Marge (€)</label>
             <input
               type="number"
               id="margeApres"
@@ -242,7 +268,7 @@
               oninput="updateFromMarge('Apres')"
             />
 
-            <label class="form-label mt-3">Gain (%)</label>
+            <label class="mt-3">Variation prix vente (%)</label>
             <input
               type="number"
               id="gainPourcent"
@@ -260,7 +286,6 @@
         </div>
         <div class="card-body">
           <p id="competitiviteTexte" class="text-center"></p>
-
           <div class="progress">
             <div
               id="competitiviteBarre"
@@ -274,9 +299,7 @@
 
     <!-- SCRIPT -->
     <script>
-      /* ---------------------------------------------------
-   🔄 SYNC COEF ↔ VENTE ↔ MARGE
---------------------------------------------------- */
+      /* SYNC CALCULS */
 
       function updateFromCoef(side) {
         const achat = parseFloat(document.getElementById("achat" + side).value);
@@ -317,15 +340,13 @@
         updateAll();
       }
 
-      /* ---------------------------------------------------
-   🎯 BOUTON = GAIN AVANT
---------------------------------------------------- */
+      /* BOUTON = GAIN AVANT */
 
       function calcCoefEqualGain() {
         const achatA = parseFloat(achatAvant.value);
         const venteA = parseFloat(venteAvant.value);
-        const margeA = venteA - achatA;
 
+        const margeA = venteA - achatA;
         const achatB = parseFloat(achatApres.value);
 
         const venteExact = achatB + margeA;
@@ -338,9 +359,7 @@
         updateAll();
       }
 
-      /* ---------------------------------------------------
-   🔄 CALCUL GLOBAL
---------------------------------------------------- */
+      /* CALCUL GLOBAL */
 
       function updateAll() {
         const prix = parseFloat(prixPublic.value);
@@ -348,23 +367,19 @@
         achatAvant.value = (prix * (1 - remiseAvant.value / 100)).toFixed(2);
         achatApres.value = (prix * (1 - remiseApres.value / 100)).toFixed(2);
 
-        updateGain();
+        updateVariation();
         updateCompetitivite();
       }
 
-      /* ---------------------------------------------------
-   📉 GAIN %
---------------------------------------------------- */
+      /* VARIATION PRIX */
 
-      function updateGain() {
+      function updateVariation() {
         const vA = parseFloat(venteAvant.value);
         const vB = parseFloat(venteApres.value);
         gainPourcent.value = ((vB / vA - 1) * 100).toFixed(2);
       }
 
-      /* ---------------------------------------------------
-   📢 MESSAGE COMMERCIAL PREMIUM
---------------------------------------------------- */
+      /* MESSAGE COMMERCIAL */
 
       function updateCompetitivite() {
         const vA = parseFloat(venteAvant.value);
@@ -387,14 +402,8 @@
           msg =
             "🟢 Même marge, prix plus bas de <b>" +
             Math.abs(varPrix).toFixed(2) +
-            "%</b>. Plus compétitif.";
+            "%</b>. Vous devenez plus compétitif.";
           color = "bg-success";
-        } else if (Math.abs(varMarge) < 0.01 && varPrix > 0) {
-          msg =
-            "🟠 Même marge mais prix +<b>" +
-            Math.abs(varPrix).toFixed(2) +
-            "%</b>. Attention.";
-          color = "bg-warning";
         } else if (varMarge > 0 && varPrix < 0) {
           msg =
             "🌟 Marge +<b>" +
@@ -407,25 +416,22 @@
           msg =
             "⚖️ Marge +<b>" +
             Math.abs(varMarge).toFixed(2) +
-            "%</b>, prix +<b>" +
+            "%</b> mais prix +<b>" +
             Math.abs(varPrix).toFixed(2) +
-            "%</b>. Rentable mais moins compétitif.";
-          color = "bg-info";
+            "%</b>.";
+          color = "bg-warning";
         } else {
           msg =
-            "🔵 Prix attractif mais marge en retrait : stratégie à manier avec précision.";
+            "🔵 Prix plus attractif mais marge réduite : arbitrage stratégique.";
           color = "bg-primary";
         }
 
         txt.innerHTML = msg;
-
         bar.className = "progress-bar " + color;
         bar.style.width = Math.min(Math.abs(varMarge - varPrix), 100) + "%";
       }
 
-      /* ---------------------------------------------------
-   💾 SAUVEGARDE CONFIGS
---------------------------------------------------- */
+      /* SAUVEGARDES */
 
       function getAllConfigs() {
         return JSON.parse(localStorage.getItem("coefConfigs") || "{}");
