@@ -35,19 +35,54 @@
 
       .toolbar {
         background: white;
-        border-radius: 12px;
-        padding: 12px 16px;
+        border-radius: 14px;
+        padding: 14px;
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
       }
 
-      #competitiviteTexte {
-        font-size: 1.25rem;
-        font-weight: 600;
+      /* --- MODE COMPARATIF PREMIUM --- */
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .compare-card {
+        border-radius: 12px;
+        padding: 0;
+        margin: 0;
+      }
+
+      .sticky-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        padding: 8px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: white;
+        text-align: center;
+      }
+
+      /* Labels et inputs plus compacts pour mobile */
+      @media (max-width: 768px) {
+        label {
+          font-size: 0.78rem;
+        }
+        input.form-control {
+          font-size: 0.85rem;
+          padding: 6px 8px;
+        }
       }
 
       .progress {
         height: 18px;
         border-radius: 20px;
+      }
+
+      #competitiviteTexte {
+        font-size: 1.25rem;
+        font-weight: 600;
       }
     </style>
   </head>
@@ -79,11 +114,9 @@
           <button class="btn btn-primary" onclick="saveConfiguration()">
             💾 Sauvegarder
           </button>
-
           <select id="configList" class="form-select">
             <option value="">— Configurations —</option>
           </select>
-
           <button class="btn btn-success" onclick="loadConfiguration()">
             📂 Charger
           </button>
@@ -107,119 +140,115 @@
         </div>
       </div>
 
-      <!-- AVANT / APRES -->
-      <div class="row g-4">
+      <!-- ⚡ GRID AVANT / APRÈS côte à côte même sur mobile -->
+      <div class="compare-grid">
         <!-- AVANT -->
-        <div class="col-lg-6">
-          <div class="card">
-            <div class="card-header bg-primary text-white">Avant</div>
-            <div class="card-body">
-              <label class="form-label">Remise (%)</label>
-              <input
-                type="number"
-                id="remiseAvant"
-                class="form-control"
-                oninput="updateAll()"
-              />
+        <div class="compare-card">
+          <div class="sticky-header bg-primary">Avant</div>
+          <div class="p-3">
+            <label class="form-label">Remise (%)</label>
+            <input
+              type="number"
+              id="remiseAvant"
+              class="form-control"
+              oninput="updateAll()"
+            />
 
-              <label class="form-label mt-3">Prix d'achat (€)</label>
-              <input
-                type="number"
-                id="achatAvant"
-                class="form-control"
-                readonly
-              />
+            <label class="form-label mt-3">Prix d'achat (€)</label>
+            <input
+              type="number"
+              id="achatAvant"
+              class="form-control"
+              readonly
+            />
 
-              <label class="form-label mt-3">Coef de vente</label>
-              <input
-                type="number"
-                id="coefAvant"
-                step="0.01"
-                class="form-control"
-                oninput="updateFromCoef('Avant')"
-              />
+            <label class="form-label mt-3">Coef de vente</label>
+            <input
+              type="number"
+              id="coefAvant"
+              step="0.01"
+              class="form-control"
+              oninput="updateFromCoef('Avant')"
+            />
 
-              <label class="form-label mt-3">Prix de vente (€)</label>
-              <input
-                type="number"
-                id="venteAvant"
-                class="form-control"
-                oninput="updateFromVente('Avant')"
-              />
+            <label class="form-label mt-3">Prix de vente (€)</label>
+            <input
+              type="number"
+              id="venteAvant"
+              class="form-control"
+              oninput="updateFromVente('Avant')"
+            />
 
-              <label class="form-label mt-3">Marge (€)</label>
-              <input
-                type="number"
-                id="margeAvant"
-                class="form-control"
-                oninput="updateFromMarge('Avant')"
-              />
-            </div>
+            <label class="form-label mt-3">Marge (€)</label>
+            <input
+              type="number"
+              id="margeAvant"
+              class="form-control"
+              oninput="updateFromMarge('Avant')"
+            />
           </div>
         </div>
 
-        <!-- APRES -->
-        <div class="col-lg-6">
-          <div class="card">
-            <div class="card-header bg-success text-white">Après</div>
-            <div class="card-body">
-              <label class="form-label">Nouvelle Remise (%)</label>
+        <!-- APRÈS -->
+        <div class="compare-card">
+          <div class="sticky-header bg-success">Après</div>
+          <div class="p-3">
+            <label class="form-label">Nouvelle Remise (%)</label>
+            <input
+              type="number"
+              id="remiseApres"
+              class="form-control"
+              oninput="updateAll()"
+            />
+
+            <label class="form-label mt-3">Nouveau Prix d'achat (€)</label>
+            <input
+              type="number"
+              id="achatApres"
+              class="form-control"
+              readonly
+            />
+
+            <label class="form-label mt-3">Nouveau Coef de vente</label>
+            <div class="input-group">
               <input
                 type="number"
-                id="remiseApres"
+                id="coefApres"
+                step="0.01"
                 class="form-control"
-                oninput="updateAll()"
+                oninput="updateFromCoef('Apres')"
               />
-
-              <label class="form-label mt-3">Nouveau Prix d'achat (€)</label>
-              <input
-                type="number"
-                id="achatApres"
-                class="form-control"
-                readonly
-              />
-
-              <label class="form-label mt-3">Nouveau Coef de vente</label>
-              <div class="input-group">
-                <input
-                  type="number"
-                  id="coefApres"
-                  step="0.01"
-                  class="form-control"
-                  oninput="updateFromCoef('Apres')"
-                />
-                <button
-                  class="btn btn-outline-primary"
-                  onclick="calcCoefEqualGain()"
-                >
-                  = Gain Avant
-                </button>
-              </div>
-
-              <label class="form-label mt-3">Nouveau Prix de vente (€)</label>
-              <input
-                type="number"
-                id="venteApres"
-                class="form-control"
-                oninput="updateFromVente('Apres')"
-              />
-
-              <label class="form-label mt-3">Nouvelle Marge (€)</label>
-              <input
-                type="number"
-                id="margeApres"
-                class="form-control"
-                oninput="updateFromMarge('Apres')"
-              />
-
-              <label class="form-label mt-3">Gain (%)</label>
-              <input
-                type="number"
-                id="gainPourcent"
-                class="form-control"
-                readonly
-              />
+              <button
+                class="btn btn-outline-primary"
+                onclick="calcCoefEqualGain()"
+              >
+                = Gain Avant
+              </button>
             </div>
+
+            <label class="form-label mt-3">Nouveau Prix de vente (€)</label>
+            <input
+              type="number"
+              id="venteApres"
+              class="form-control"
+              oninput="updateFromVente('Apres')"
+            />
+
+            <label class="form-label mt-3">Nouvelle Marge (€)</label>
+            <input
+              type="number"
+              id="margeApres"
+              class="form-control"
+              oninput="updateFromMarge('Apres')"
+            />
+
+            <label class="form-label mt-3">Gain (%)</label>
+            <input
+              type="number"
+              id="gainPourcent"
+              class="form-control"
+              readonly
+            />
           </div>
         </div>
       </div>
@@ -245,9 +274,9 @@
 
     <!-- SCRIPT -->
     <script>
-      /* -------------------------------------
-   LOGIQUE DE RECALCUL INTELLIGENT
---------------------------------------*/
+      /* ---------------------------------------------------
+   🔄 SYNC COEF ↔ VENTE ↔ MARGE
+--------------------------------------------------- */
 
       function updateFromCoef(side) {
         const achat = parseFloat(document.getElementById("achat" + side).value);
@@ -288,62 +317,58 @@
         updateAll();
       }
 
-      /* -------------------------------------
-   BOUTON = GAIN AVANT
---------------------------------------*/
+      /* ---------------------------------------------------
+   🎯 BOUTON = GAIN AVANT
+--------------------------------------------------- */
 
       function calcCoefEqualGain() {
         const achatA = parseFloat(achatAvant.value);
         const venteA = parseFloat(venteAvant.value);
-
         const margeA = venteA - achatA;
+
         const achatB = parseFloat(achatApres.value);
 
         const venteExact = achatB + margeA;
         const coefExact = venteExact / achatB;
 
-        venteApres.value = venteExact.toFixed(2);
         coefApres.value = coefExact.toFixed(2);
+        venteApres.value = venteExact.toFixed(2);
         margeApres.value = margeA.toFixed(2);
 
         updateAll();
       }
 
-      /* -------------------------------------
-   CALCUL GLOBAL
---------------------------------------*/
+      /* ---------------------------------------------------
+   🔄 CALCUL GLOBAL
+--------------------------------------------------- */
 
       function updateAll() {
         const prix = parseFloat(prixPublic.value);
 
-        // Achat recalculé automatiquement
         achatAvant.value = (prix * (1 - remiseAvant.value / 100)).toFixed(2);
         achatApres.value = (prix * (1 - remiseApres.value / 100)).toFixed(2);
 
-        // Recalcule les messages & gains
-        updateCompetitivite();
         updateGain();
+        updateCompetitivite();
       }
 
-      /* -------------------------------------
-   GAIN %
---------------------------------------*/
+      /* ---------------------------------------------------
+   📉 GAIN %
+--------------------------------------------------- */
 
       function updateGain() {
         const vA = parseFloat(venteAvant.value);
         const vB = parseFloat(venteApres.value);
-
         gainPourcent.value = ((vB / vA - 1) * 100).toFixed(2);
       }
 
-      /* -------------------------------------
-   MESSAGE COMMERCIAL
---------------------------------------*/
+      /* ---------------------------------------------------
+   📢 MESSAGE COMMERCIAL PREMIUM
+--------------------------------------------------- */
 
       function updateCompetitivite() {
         const vA = parseFloat(venteAvant.value);
         const vB = parseFloat(venteApres.value);
-
         const mA = parseFloat(margeAvant.value);
         const mB = parseFloat(margeApres.value);
 
@@ -387,7 +412,8 @@
             "%</b>. Rentable mais moins compétitif.";
           color = "bg-info";
         } else {
-          msg = "🔵 Prix plus attractif mais marge réduite.";
+          msg =
+            "🔵 Prix attractif mais marge en retrait : stratégie à manier avec précision.";
           color = "bg-primary";
         }
 
@@ -397,17 +423,25 @@
         bar.style.width = Math.min(Math.abs(varMarge - varPrix), 100) + "%";
       }
 
-      /* -------------------------------------
-   SAUVEGARDE (localStorage)
---------------------------------------*/
+      /* ---------------------------------------------------
+   💾 SAUVEGARDE CONFIGS
+--------------------------------------------------- */
 
       function getAllConfigs() {
         return JSON.parse(localStorage.getItem("coefConfigs") || "{}");
       }
 
+      function updateConfigList() {
+        const configs = getAllConfigs();
+        configList.innerHTML = `<option value="">— Configurations —</option>`;
+        for (const name in configs) {
+          configList.innerHTML += `<option value="${name}">${name}</option>`;
+        }
+      }
+
       function saveConfiguration() {
         const name = configName.value.trim();
-        if (!name) return alert("Nom de configuration obligatoire.");
+        if (!name) return alert("Nom obligatoire.");
 
         const configs = getAllConfigs();
 
@@ -444,20 +478,14 @@
         if (!name) return;
 
         const configs = getAllConfigs();
+
         delete configs[name];
         localStorage.setItem("coefConfigs", JSON.stringify(configs));
 
         updateConfigList();
       }
 
-      function updateConfigList() {
-        const configs = getAllConfigs();
-        configList.innerHTML = `<option value="">— Configurations —</option>`;
-        for (const name in configs) {
-          configList.innerHTML += `<option value="${name}">${name}</option>`;
-        }
-      }
-
+      /* INIT */
       updateConfigList();
       updateAll();
     </script>
