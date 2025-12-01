@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <title>Calculateur de Coefficient de Vente - CRI</title>
 
     <!-- Bootstrap -->
@@ -13,7 +14,7 @@
 
     <style>
       body {
-        background: #f0f2f5;
+        background: #eef1f5;
         font-family: "Inter", system-ui, sans-serif;
       }
 
@@ -40,75 +41,67 @@
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
       }
 
-      /* --- MODE COMPARATIF PREMIUM --- */
+      /* Layout AVANT/APRES */
       .compare-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 16px;
       }
 
+      @media (max-width: 768px) {
+        .compare-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
       .compare-card {
+        background: #f7f8fa;
         border-radius: 14px;
         overflow: hidden;
-      }
-
-      /* Fond bloc Avant */
-      .avant-bg {
-        background: #f7f8fa;
-        color: #000;
-      }
-
-      /* Fond bloc Après */
-      .apres-bg {
-        background: #0a2345;
-        color: white;
       }
 
       .sticky-header {
         position: sticky;
         top: 0;
-        z-index: 20;
-        padding: 10px;
-        font-size: 1.1rem;
+        padding: 12px;
         font-weight: 700;
         text-align: center;
+        font-size: 1.2rem;
       }
 
-      .avant-header {
-        background: #0066ff;
-        color: white;
+      .header-avant {
+        background: #c7cdd4;
+        color: black;
       }
 
-      .apres-header {
-        background: #008852;
+      .header-apres {
+        background: #0a2345; /* Bleu CRI */
         color: white;
       }
 
       label {
-        font-size: 0.78rem;
-        margin-bottom: 2px;
+        font-size: 0.82rem;
+        margin-bottom: 3px;
       }
 
       input.form-control {
-        font-size: 0.85rem;
-        padding: 6px 8px;
+        font-size: 16px !important; /* empêche le zoom iPhone */
+        padding: 7px 9px;
+        height: auto;
       }
 
-      /* Inputs blancs sur fond bleu CRI */
-      .apres-bg input {
-        background: white !important;
-        color: #000 !important;
-        border: none;
+      .input-auto-btn {
+        font-size: 19px;
+        padding: 0 10px;
+        line-height: 1;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        cursor: pointer;
       }
 
-      .progress {
-        height: 18px;
-        border-radius: 20px;
-      }
-
-      #competitiviteTexte {
-        font-size: 1.25rem;
-        font-weight: 600;
+      .input-auto-btn:hover {
+        background: #e9ecef;
       }
     </style>
   </head>
@@ -130,9 +123,7 @@
         class="toolbar d-flex flex-column flex-md-row justify-content-between gap-3 mb-4"
       >
         <div class="flex-grow-1">
-          <label class="form-label fw-bold mb-1"
-            >Nom de la configuration :</label
-          >
+          <label class="fw-bold mb-1">Nom de la configuration :</label>
           <input type="text" id="configName" class="form-control" />
         </div>
 
@@ -166,11 +157,12 @@
         </div>
       </div>
 
-      <!-- GRID AVANT / APRES -->
+      <!-- AVANT / APRES -->
       <div class="compare-grid">
         <!-- AVANT -->
-        <div class="compare-card avant-bg">
-          <div class="sticky-header avant-header">Avant</div>
+        <div class="compare-card">
+          <div class="sticky-header header-avant">Avant</div>
+
           <div class="p-3">
             <label>Remise (%)</label>
             <input
@@ -216,8 +208,9 @@
         </div>
 
         <!-- APRES -->
-        <div class="compare-card apres-bg">
-          <div class="sticky-header apres-header">Après</div>
+        <div class="compare-card">
+          <div class="sticky-header header-apres">Après</div>
+
           <div class="p-3">
             <label>Remise (%)</label>
             <input
@@ -244,12 +237,12 @@
                 class="form-control"
                 oninput="updateFromCoef('Apres')"
               />
-              <button
-                class="btn btn-outline-light"
+              <span
+                class="input-auto-btn"
                 onclick="calcCoefEqualGain()"
+                title="Ajuster automatiquement la marge"
+                >🔄</span
               >
-                = Gain Avant
-              </button>
             </div>
 
             <label class="mt-3">Prix vente (€)</label>
@@ -267,14 +260,6 @@
               class="form-control"
               oninput="updateFromMarge('Apres')"
             />
-
-            <label class="mt-3">Variation prix vente (%)</label>
-            <input
-              type="number"
-              id="gainPourcent"
-              class="form-control"
-              readonly
-            />
           </div>
         </div>
       </div>
@@ -285,11 +270,11 @@
           Résultat de Compétitivité
         </div>
         <div class="card-body">
-          <p id="competitiviteTexte" class="text-center"></p>
+          <p id="competitiviteTexte" class="text-center fs-5 fw-semibold"></p>
           <div class="progress">
             <div
               id="competitiviteBarre"
-              class="progress-bar bg-secondary"
+              class="progress-bar"
               style="width: 0%"
             ></div>
           </div>
@@ -299,7 +284,7 @@
 
     <!-- SCRIPT -->
     <script>
-      /* SYNC CALCULS */
+      /* ---------- CALCULS ---------- */
 
       function updateFromCoef(side) {
         const achat = parseFloat(document.getElementById("achat" + side).value);
@@ -340,13 +325,13 @@
         updateAll();
       }
 
-      /* BOUTON = GAIN AVANT */
+      /* ---------- AUTO (GAIN AVANT) ---------- */
 
       function calcCoefEqualGain() {
         const achatA = parseFloat(achatAvant.value);
         const venteA = parseFloat(venteAvant.value);
-
         const margeA = venteA - achatA;
+
         const achatB = parseFloat(achatApres.value);
 
         const venteExact = achatB + margeA;
@@ -359,7 +344,7 @@
         updateAll();
       }
 
-      /* CALCUL GLOBAL */
+      /* ---------- CALCUL PRINCIPAL ---------- */
 
       function updateAll() {
         const prix = parseFloat(prixPublic.value);
@@ -367,19 +352,10 @@
         achatAvant.value = (prix * (1 - remiseAvant.value / 100)).toFixed(2);
         achatApres.value = (prix * (1 - remiseApres.value / 100)).toFixed(2);
 
-        updateVariation();
         updateCompetitivite();
       }
 
-      /* VARIATION PRIX */
-
-      function updateVariation() {
-        const vA = parseFloat(venteAvant.value);
-        const vB = parseFloat(venteApres.value);
-        gainPourcent.value = ((vB / vA - 1) * 100).toFixed(2);
-      }
-
-      /* MESSAGE COMMERCIAL */
+      /* ---------- MESSAGE COMMERCIAL ---------- */
 
       function updateCompetitivite() {
         const vA = parseFloat(venteAvant.value);
@@ -410,7 +386,7 @@
             Math.abs(varMarge).toFixed(2) +
             "%</b> et prix -<b>" +
             Math.abs(varPrix).toFixed(2) +
-            "%</b>. Scénario idéal.";
+            "%</b>. Scénario idéal : rentabilité + compétitivité.";
           color = "bg-success";
         } else if (varMarge > 0 && varPrix > 0) {
           msg =
@@ -421,8 +397,7 @@
             "%</b>.";
           color = "bg-warning";
         } else {
-          msg =
-            "🔵 Prix plus attractif mais marge réduite : arbitrage stratégique.";
+          msg = "🔵 Prix plus attractif, marge réduite : décision stratégique.";
           color = "bg-primary";
         }
 
@@ -431,7 +406,7 @@
         bar.style.width = Math.min(Math.abs(varMarge - varPrix), 100) + "%";
       }
 
-      /* SAUVEGARDES */
+      /* ---------- SAUVEGARDES ---------- */
 
       function getAllConfigs() {
         return JSON.parse(localStorage.getItem("coefConfigs") || "{}");
