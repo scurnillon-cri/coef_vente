@@ -36,7 +36,7 @@
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
       }
 
-      /* GRID */
+      /* GRID AVANT / APRES */
       .compare-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -45,7 +45,7 @@
 
       @media (max-width: 450px) {
         .compare-grid {
-          grid-template-columns: 1fr 1fr; /* reste côte à côte sur mobile */
+          grid-template-columns: 1fr 1fr; /* reste côte à côte même sur mobile */
         }
       }
 
@@ -69,7 +69,7 @@
       }
 
       .header-apres {
-        background: #0a2345;
+        background: #0a2345; /* Bleu CRI */
         color: white;
       }
 
@@ -78,11 +78,11 @@
         margin-bottom: 2px !important;
       }
 
-      /* Champs compactés */
+      /* Champs compacts + anti-zoom iPhone */
       input.form-control {
-        font-size: 16px !important; /* PAS DE ZOOM iPHONE */
+        font-size: 16px !important;
         padding: 4px 6px !important;
-        height: 34px !important; /* Taille Small */
+        height: 34px !important;
         border-radius: 6px;
       }
 
@@ -123,7 +123,7 @@
       <div
         class="cri-header d-flex flex-column flex-md-row align-items-center justify-content-between px-4 py-3 mb-4"
       >
-        <img src="logo_cri.png" class="cri-logo" />
+        <img src="logo_cri.png" class="cri-logo" alt="CRI" />
         <h1 class="mt-3 mt-md-0 text-center text-md-end">
           Calculateur de Coefficient de Vente
         </h1>
@@ -168,7 +168,7 @@
         </div>
       </div>
 
-      <!-- GRID AVANT / APRES -->
+      <!-- AVANT / APRES -->
       <div class="compare-grid">
         <!-- AVANT -->
         <div class="compare-card">
@@ -248,12 +248,15 @@
                 class="form-control"
                 oninput="updateFromCoef('Apres')"
               />
+              <!-- Bouton qui ouvre la popup de stratégie -->
               <span
                 class="auto-btn"
-                onclick="calcCoefEqualGain()"
-                title="Ajuster automatiquement"
-                >🔄</span
+                data-bs-toggle="modal"
+                data-bs-target="#strategieModal"
+                title="Choisir une stratégie de calcul"
               >
+                🔄
+              </span>
             </div>
 
             <label class="mt-2">Prix vente (€)</label>
@@ -293,12 +296,86 @@
       </div>
     </div>
 
+    <!-- MODALE STRATÉGIE -->
+    <div
+      class="modal fade"
+      id="strategieModal"
+      tabindex="-1"
+      aria-labelledby="strategieModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="strategieModalLabel">
+              Choisir une stratégie
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Fermer"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Comment souhaitez-vous utiliser le gain lié à la nouvelle remise
+              fournisseur&nbsp;?
+            </p>
+
+            <div class="mb-3">
+              <button
+                type="button"
+                class="btn btn-outline-danger w-100 mb-1"
+                onclick="strategieOffensive()"
+                data-bs-dismiss="modal"
+              >
+                Stratégie offensive
+              </button>
+              <small class="text-muted">
+                Même marge qu'avant, mais prix de vente plus agressif.
+              </small>
+            </div>
+
+            <div class="mb-1">
+              <button
+                type="button"
+                class="btn btn-outline-primary w-100 mb-1"
+                onclick="strategieEquilibre()"
+                data-bs-dismiss="modal"
+              >
+                Stratégie équilibre
+              </button>
+              <small class="text-muted">
+                Gain réparti : moitié en marge en plus, moitié en baisse de
+                prix.
+              </small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-      /* ---------- CALCULS ---------- */
+      /* ---------- CALCULS BASIQUES ---------- */
 
       function updateFromCoef(side) {
         const achat = parseFloat(document.getElementById("achat" + side).value);
         const coef = parseFloat(document.getElementById("coef" + side).value);
+
+        if (isNaN(achat) || isNaN(coef) || achat <= 0) return;
 
         const vente = achat * coef;
         const marge = vente - achat;
@@ -313,6 +390,8 @@
         const achat = parseFloat(document.getElementById("achat" + side).value);
         const vente = parseFloat(document.getElementById("vente" + side).value);
 
+        if (isNaN(achat) || isNaN(vente) || achat <= 0) return;
+
         const coef = vente / achat;
         const marge = vente - achat;
 
@@ -326,6 +405,8 @@
         const achat = parseFloat(document.getElementById("achat" + side).value);
         const marge = parseFloat(document.getElementById("marge" + side).value);
 
+        if (isNaN(achat) || isNaN(marge) || achat <= 0) return;
+
         const vente = achat + marge;
         const coef = vente / achat;
 
@@ -335,32 +416,72 @@
         updateAll();
       }
 
-      /* ---------- AUTO (GAIN AVANT) ---------- */
+      /* ---------- STRATEGIES ---------- */
 
-      function calcCoefEqualGain() {
+      // 1) Stratégie offensive : même marge, prix agressif
+      function strategieOffensive() {
         const achatA = parseFloat(achatAvant.value);
         const venteA = parseFloat(venteAvant.value);
-        const margeA = venteA - achatA;
-
         const achatB = parseFloat(achatApres.value);
 
-        const venteExact = achatB + margeA;
-        const coefExact = venteExact / achatB;
+        if ([achatA, venteA, achatB].some((v) => isNaN(v) || v <= 0)) return;
 
-        coefApres.value = coefExact.toFixed(2);
-        venteApres.value = venteExact.toFixed(2);
+        const margeA = venteA - achatA;
+
+        const venteB = achatB + margeA;
+        const coefB = venteB / achatB;
+
+        coefApres.value = coefB.toFixed(2);
+        venteApres.value = venteB.toFixed(2);
         margeApres.value = margeA.toFixed(2);
 
         updateAll();
       }
 
-      /* ---------- GLOBAL UPDATE ---------- */
+      // 2) Stratégie équilibre : 50% gain en marge, 50% en baisse de prix
+      function strategieEquilibre() {
+        const achatA = parseFloat(achatAvant.value);
+        const venteA = parseFloat(venteAvant.value);
+        const achatB = parseFloat(achatApres.value);
+
+        if ([achatA, venteA, achatB].some((v) => isNaN(v) || v <= 0)) return;
+
+        const margeA = venteA - achatA;
+        const margeMax = venteA - achatB; // marge possible si on garde le même prix
+        const gainTotal = margeMax - margeA;
+
+        if (gainTotal <= 0) {
+          // Pas de gain, on retombe sur offensive
+          strategieOffensive();
+          return;
+        }
+
+        const margeB = margeA + gainTotal / 2; // moitié du gain en marge
+        const venteB = achatB + margeB; // reste en baisse de prix
+        const coefB = venteB / achatB;
+
+        coefApres.value = coefB.toFixed(2);
+        venteApres.value = venteB.toFixed(2);
+        margeApres.value = margeB.toFixed(2);
+
+        updateAll();
+      }
+
+      /* ---------- MISE A JOUR GLOBALE ---------- */
 
       function updateAll() {
         const prix = parseFloat(prixPublic.value);
 
-        achatAvant.value = (prix * (1 - remiseAvant.value / 100)).toFixed(2);
-        achatApres.value = (prix * (1 - remiseApres.value / 100)).toFixed(2);
+        if (!isNaN(prix)) {
+          achatAvant.value = (
+            prix *
+            (1 - parseFloat(remiseAvant.value || 0) / 100)
+          ).toFixed(2);
+          achatApres.value = (
+            prix *
+            (1 - parseFloat(remiseApres.value || 0) / 100)
+          ).toFixed(2);
+        }
 
         updateCompetitivite();
       }
@@ -376,7 +497,12 @@
         const txt = document.getElementById("competitiviteTexte");
         const bar = document.getElementById("competitiviteBarre");
 
-        if (!vA || !vB || !mA) return;
+        if ([vA, vB, mA, mB].some((v) => isNaN(v) || v === 0)) {
+          txt.innerHTML = "";
+          bar.style.width = "0%";
+          bar.className = "progress-bar";
+          return;
+        }
 
         const varPrix = (vB / vA - 1) * 100;
         const varMarge = (mB / mA - 1) * 100;
@@ -386,29 +512,29 @@
 
         if (Math.abs(varMarge) < 0.01 && varPrix < 0) {
           msg =
-            "🟢 Même marge, prix plus bas de <b>" +
+            "🟢 Stratégie offensive : même marge, prix plus bas de <b>" +
             Math.abs(varPrix).toFixed(2) +
             "%</b>. Vous devenez plus compétitif.";
           color = "bg-success";
         } else if (varMarge > 0 && varPrix < 0) {
           msg =
-            "🌟 Marge +<b>" +
+            "🌟 Stratégie équilibre : marge +<b>" +
             Math.abs(varMarge).toFixed(2) +
             "%</b> et prix -<b>" +
             Math.abs(varPrix).toFixed(2) +
-            "%</b>. Scénario idéal.";
+            "%</b>. Plus rentable ET plus compétitif.";
           color = "bg-success";
         } else if (varMarge > 0 && varPrix > 0) {
           msg =
             "⚖️ Marge +<b>" +
             Math.abs(varMarge).toFixed(2) +
-            "%</b> mais prix +<b>" +
+            "%</b>, mais prix +<b>" +
             Math.abs(varPrix).toFixed(2) +
-            "%</b>.";
+            "%</b>. Rentable mais moins compétitif.";
           color = "bg-warning";
         } else {
           msg =
-            "🔵 Prix plus attractif, marge en retrait : arbitrage stratégique.";
+            "🔵 Prix plus attractif, marge en retrait : levier stratégique à manier avec précaution.";
           color = "bg-primary";
         }
 
