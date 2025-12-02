@@ -17,7 +17,6 @@
         font-family: "Inter", system-ui, sans-serif;
       }
 
-      /* HEADER */
       .cri-header {
         background: white;
         border-radius: 14px;
@@ -28,7 +27,6 @@
         max-height: 80px;
       }
 
-      /* TOOLBAR */
       .toolbar {
         background: white;
         border-radius: 14px;
@@ -36,7 +34,6 @@
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
       }
 
-      /* GRID AVANT / APRES */
       .compare-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -45,7 +42,7 @@
 
       @media (max-width: 450px) {
         .compare-grid {
-          grid-template-columns: 1fr 1fr; /* reste côte à côte même sur mobile */
+          grid-template-columns: 1fr 1fr;
         }
       }
 
@@ -69,7 +66,7 @@
       }
 
       .header-apres {
-        background: #0a2345; /* Bleu CRI */
+        background: #0a2345;
         color: white;
       }
 
@@ -78,16 +75,11 @@
         margin-bottom: 2px !important;
       }
 
-      /* Champs compacts + anti-zoom iPhone */
       input.form-control {
         font-size: 16px !important;
         padding: 4px 6px !important;
         height: 34px !important;
         border-radius: 6px;
-      }
-
-      .input-group {
-        align-items: center;
       }
 
       .auto-btn {
@@ -103,7 +95,6 @@
         background: #e5e5e5;
       }
 
-      /* Résultat */
       .card {
         border-radius: 14px;
         border: none;
@@ -119,7 +110,6 @@
 
   <body class="p-3">
     <div class="container">
-      <!-- HEADER -->
       <div
         class="cri-header d-flex flex-column flex-md-row align-items-center justify-content-between px-4 py-3 mb-4"
       >
@@ -129,7 +119,6 @@
         </h1>
       </div>
 
-      <!-- TOOLBAR -->
       <div
         class="toolbar d-flex flex-column flex-md-row justify-content-between gap-3 mb-4"
       >
@@ -154,7 +143,6 @@
         </div>
       </div>
 
-      <!-- PRIX PUBLIC -->
       <div class="card mb-4">
         <div class="card-header bg-dark text-white">Prix Public</div>
         <div class="card-body">
@@ -163,14 +151,12 @@
             id="prixPublic"
             class="form-control"
             value="500"
-            oninput="updateAll()"
+            oninput="updateAll(); updateCompetitivite();"
           />
         </div>
       </div>
 
-      <!-- AVANT / APRES -->
       <div class="compare-grid">
-        <!-- AVANT -->
         <div class="compare-card">
           <div class="sticky-header header-avant">Avant</div>
 
@@ -180,7 +166,7 @@
               type="number"
               id="remiseAvant"
               class="form-control"
-              oninput="updateAll()"
+              oninput="updateAll(); updateCompetitivite();"
             />
 
             <label class="mt-2">Prix achat (€)</label>
@@ -197,7 +183,7 @@
               id="coefAvant"
               step="0.01"
               class="form-control"
-              oninput="updateFromCoef('Avant')"
+              oninput="updateFromCoef('Avant'); updateCompetitivite();"
             />
 
             <label class="mt-2">Prix vente (€)</label>
@@ -205,7 +191,7 @@
               type="number"
               id="venteAvant"
               class="form-control"
-              oninput="updateFromVente('Avant')"
+              oninput="updateFromVente('Avant'); updateCompetitivite();"
             />
 
             <label class="mt-2">Marge (€)</label>
@@ -213,14 +199,13 @@
               type="number"
               id="margeAvant"
               class="form-control"
-              oninput="updateFromMarge('Avant')"
+              oninput="updateFromMarge('Avant'); updateCompetitivite();"
             />
           </div>
         </div>
 
-        <!-- APRES -->
         <div class="compare-card">
-          <div class="sticky-header header-apres">Après</div>
+          <div class="sticky-header header-apres">Avec LE CRI</div>
 
           <div class="px-3">
             <label>Remise (%)</label>
@@ -228,7 +213,7 @@
               type="number"
               id="remiseApres"
               class="form-control"
-              oninput="updateAll()"
+              oninput="updateAll(); updateCompetitivite();"
             />
 
             <label class="mt-2">Prix achat (€)</label>
@@ -246,9 +231,9 @@
                 id="coefApres"
                 step="0.01"
                 class="form-control"
-                oninput="updateFromCoef('Apres')"
+                oninput="updateFromCoef('Apres'); updateCompetitivite();"
               />
-              <!-- Bouton qui ouvre la popup de stratégie -->
+
               <span
                 class="auto-btn"
                 data-bs-toggle="modal"
@@ -264,7 +249,7 @@
               type="number"
               id="venteApres"
               class="form-control"
-              oninput="updateFromVente('Apres')"
+              oninput="updateFromVente('Apres'); updateCompetitivite();"
             />
 
             <label class="mt-2">Marge (€)</label>
@@ -272,13 +257,12 @@
               type="number"
               id="margeApres"
               class="form-control"
-              oninput="updateFromMarge('Apres')"
+              oninput="updateFromMarge('Apres'); updateCompetitivite();"
             />
           </div>
         </div>
       </div>
 
-      <!-- RESULTAT -->
       <div class="card mt-4">
         <div class="card-header bg-info text-white">
           Résultat de Compétitivité
@@ -296,68 +280,64 @@
       </div>
     </div>
 
-    <!-- MODALE STRATÉGIE -->
-    <div
-      class="modal fade"
-      id="strategieModal"
-      tabindex="-1"
-      aria-labelledby="strategieModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="strategieModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="strategieModalLabel">
-              Choisir une stratégie
-            </h5>
             <button
               type="button"
               class="btn-close"
               data-bs-dismiss="modal"
-              aria-label="Fermer"
             ></button>
           </div>
-          <div class="modal-body">
-            <p>
-              Comment souhaitez-vous utiliser le gain lié à la nouvelle remise
-              fournisseur&nbsp;?
-            </p>
 
-            <div class="mb-3">
+          <div class="modal-body fs-5">
+            <h4 class="mb-4 text-center fw-bold">Choisissez votre stratégie</h4>
+
+            <!-- STRATÉGIE OFFENSIVE -->
+            <div class="mb-4 p-3 border rounded">
               <button
                 type="button"
-                class="btn btn-outline-danger w-100 mb-1"
-                onclick="strategieOffensive()"
+                class="btn btn-danger w-100 fw-bold mb-2"
+                onclick="strategieOffensive(); updateCompetitivite();"
                 data-bs-dismiss="modal"
               >
-                Stratégie offensive
+                🚀 Stratégie OFFENSIVE
               </button>
-              <small class="text-muted">
-                Même marge qu'avant, mais prix de vente plus agressif.
+
+              <div class="text-center fw-semibold">
+                Marge = &nbsp;&nbsp;|&nbsp;&nbsp; Prix de vente ↓↓
+              </div>
+
+              <small class="text-muted d-block text-center mt-1">
+                Même marge qu'avant, prix beaucoup plus agressif. Votre CA
+                décolle !
               </small>
             </div>
 
-            <div class="mb-1">
+            <!-- STRATÉGIE ÉQUILIBRE -->
+            <div class="mb-2 p-3 border rounded">
               <button
                 type="button"
-                class="btn btn-outline-primary w-100 mb-1"
-                onclick="strategieEquilibre()"
+                class="btn btn-primary w-100 fw-bold mb-2"
+                onclick="strategieEquilibre(); updateCompetitivite();"
                 data-bs-dismiss="modal"
               >
-                Stratégie équilibre
+                ⚖️ Stratégie ÉQUILIBRE
               </button>
-              <small class="text-muted">
-                Gain réparti : moitié en marge en plus, moitié en baisse de
-                prix.
+
+              <div class="text-center fw-semibold">
+                Marge ↑ &nbsp;&nbsp;|&nbsp;&nbsp; Prix de vente ↓
+              </div>
+
+              <small class="text-muted d-block text-center mt-1">
+                Gain partagé : plus de marge et un prix plus attractif.
               </small>
             </div>
           </div>
+
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
               Fermer
             </button>
           </div>
@@ -365,16 +345,12 @@
       </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-      /* ---------- CALCULS BASIQUES ---------- */
-
       function updateFromCoef(side) {
         const achat = parseFloat(document.getElementById("achat" + side).value);
         const coef = parseFloat(document.getElementById("coef" + side).value);
-
         if (isNaN(achat) || isNaN(coef) || achat <= 0) return;
 
         const vente = achat * coef;
@@ -384,12 +360,12 @@
         document.getElementById("marge" + side).value = marge.toFixed(2);
 
         updateAll();
+        updateCompetitivite();
       }
 
       function updateFromVente(side) {
         const achat = parseFloat(document.getElementById("achat" + side).value);
         const vente = parseFloat(document.getElementById("vente" + side).value);
-
         if (isNaN(achat) || isNaN(vente) || achat <= 0) return;
 
         const coef = vente / achat;
@@ -399,12 +375,12 @@
         document.getElementById("marge" + side).value = marge.toFixed(2);
 
         updateAll();
+        updateCompetitivite();
       }
 
       function updateFromMarge(side) {
         const achat = parseFloat(document.getElementById("achat" + side).value);
         const marge = parseFloat(document.getElementById("marge" + side).value);
-
         if (isNaN(achat) || isNaN(marge) || achat <= 0) return;
 
         const vente = achat + marge;
@@ -414,20 +390,15 @@
         document.getElementById("coef" + side).value = coef.toFixed(2);
 
         updateAll();
+        updateCompetitivite();
       }
 
-      /* ---------- STRATEGIES ---------- */
-
-      // 1) Stratégie offensive : même marge, prix agressif
       function strategieOffensive() {
         const achatA = parseFloat(achatAvant.value);
         const venteA = parseFloat(venteAvant.value);
         const achatB = parseFloat(achatApres.value);
 
-        if ([achatA, venteA, achatB].some((v) => isNaN(v) || v <= 0)) return;
-
         const margeA = venteA - achatA;
-
         const venteB = achatB + margeA;
         const coefB = venteB / achatB;
 
@@ -438,26 +409,19 @@
         updateAll();
       }
 
-      // 2) Stratégie équilibre : 50% gain en marge, 50% en baisse de prix
       function strategieEquilibre() {
         const achatA = parseFloat(achatAvant.value);
         const venteA = parseFloat(venteAvant.value);
         const achatB = parseFloat(achatApres.value);
 
-        if ([achatA, venteA, achatB].some((v) => isNaN(v) || v <= 0)) return;
-
         const margeA = venteA - achatA;
-        const margeMax = venteA - achatB; // marge possible si on garde le même prix
+        const margeMax = venteA - achatB;
         const gainTotal = margeMax - margeA;
 
-        if (gainTotal <= 0) {
-          // Pas de gain, on retombe sur offensive
-          strategieOffensive();
-          return;
-        }
+        if (gainTotal <= 0) return strategieOffensive();
 
-        const margeB = margeA + gainTotal / 2; // moitié du gain en marge
-        const venteB = achatB + margeB; // reste en baisse de prix
+        const margeB = margeA + gainTotal / 2;
+        const venteB = achatB + margeB;
         const coefB = venteB / achatB;
 
         coefApres.value = coefB.toFixed(2);
@@ -466,8 +430,6 @@
 
         updateAll();
       }
-
-      /* ---------- MISE A JOUR GLOBALE ---------- */
 
       function updateAll() {
         const prix = parseFloat(prixPublic.value);
@@ -482,11 +444,7 @@
             (1 - parseFloat(remiseApres.value || 0) / 100)
           ).toFixed(2);
         }
-
-        updateCompetitivite();
       }
-
-      /* ---------- MESSAGE COMMERCIAL ---------- */
 
       function updateCompetitivite() {
         const vA = parseFloat(venteAvant.value);
@@ -500,7 +458,6 @@
         if ([vA, vB, mA, mB].some((v) => isNaN(v) || v === 0)) {
           txt.innerHTML = "";
           bar.style.width = "0%";
-          bar.className = "progress-bar";
           return;
         }
 
@@ -514,27 +471,26 @@
           msg =
             "🟢 Stratégie offensive : même marge, prix plus bas de <b>" +
             Math.abs(varPrix).toFixed(2) +
-            "%</b>. Vous devenez plus compétitif.";
+            "%</b>.";
           color = "bg-success";
         } else if (varMarge > 0 && varPrix < 0) {
           msg =
             "🌟 Stratégie équilibre : marge +<b>" +
             Math.abs(varMarge).toFixed(2) +
-            "%</b> et prix -<b>" +
+            "%</b>, prix -<b>" +
             Math.abs(varPrix).toFixed(2) +
-            "%</b>. Plus rentable ET plus compétitif.";
+            "%</b>.";
           color = "bg-success";
         } else if (varMarge > 0 && varPrix > 0) {
           msg =
             "⚖️ Marge +<b>" +
             Math.abs(varMarge).toFixed(2) +
-            "%</b>, mais prix +<b>" +
+            "%</b> mais prix +<b>" +
             Math.abs(varPrix).toFixed(2) +
-            "%</b>. Rentable mais moins compétitif.";
+            "%</b>.";
           color = "bg-warning";
         } else {
-          msg =
-            "🔵 Prix plus attractif, marge en retrait : levier stratégique à manier avec précaution.";
+          msg = "🔵 Prix plus attractif mais marge réduite.";
           color = "bg-primary";
         }
 
@@ -542,8 +498,6 @@
         bar.className = "progress-bar " + color;
         bar.style.width = Math.min(Math.abs(varMarge - varPrix), 100) + "%";
       }
-
-      /* ---------- SAUVEGARDES ---------- */
 
       function getAllConfigs() {
         return JSON.parse(localStorage.getItem("coefConfigs") || "{}");
@@ -589,6 +543,7 @@
         coefApres.value = cfg.coefApres;
 
         updateAll();
+        updateCompetitivite();
       }
 
       function deleteConfiguration() {
@@ -596,16 +551,15 @@
         if (!name) return;
 
         const configs = getAllConfigs();
-
         delete configs[name];
         localStorage.setItem("coefConfigs", JSON.stringify(configs));
 
         updateConfigList();
       }
 
-      /* INIT */
       updateConfigList();
       updateAll();
+      updateCompetitivite();
     </script>
   </body>
 </html>
